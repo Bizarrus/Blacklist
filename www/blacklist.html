@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="de">
+	<head>
+		<title>Blacklist</title>
+		<meta charset="UTF-8" />
+		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<script src="js/debug.js"></script>
+		<script src="/apps/api/knuddels-api.js"></script>
+		<script type="text/javascript">
+			Client.includeCSS('css/bootstrap.min.css', 'css/blacklist.css');
+		</script>
+		<!--[if lt IE 9]>
+			<script type="text/javascript">
+				Client.includeJS('js/html5shiv.min.js', 'js/respond.min.js');
+			</script>
+		<![endif]-->
+	</head>
+	<body>		
+		<!-- Info -->
+		<div id="info" class="modal fade" role="dialog">
+			<div class="modal-dialog" role="document">
+				<div class="modal-content">
+					<div class="modal-body">
+						<div class="container">
+							<div class="col-sm-3">
+								<h1 class="hidden-sm">Unbekannt</h1>
+								<img class="photo img-responsive" src="" alt="" />
+								<br />
+								<br />
+								<button type="button" class="btn btn-default btn-block" data-action="unlock">Entsperren</button>
+								<button type="button" class="btn btn-default btn-block" data-action="lock">Sperren</button>
+								<button type="button" class="btn btn-default btn-block" data-action="comment">Comment</button>
+							</div>
+							<div class="col-sm-9 text-left text-inner">
+								<h1 class="hidden-xs">Unbekannt</h1>
+								<label>Status:</label> <span class="status"></span>
+								<br /><label>Comments:</label>
+								<ul class="comments"></ul>
+							</div>
+						</div>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-primary" data-dismiss="modal">OK</button>
+					</div>
+				</div>
+			</div>
+		</div>
+		
+		<!-- Comment -->
+		<div id="comment" class="modal fade" role="dialog">
+			<div class="modal-dialog" role="document">
+				<div class="modal-content">
+					<div class="modal-body">
+						<form class="form-horizontal">
+							<div class="form-group">
+								<label for="comment_nickname" class="col-sm-12 control-label">Kommentar bei Unbekannt setzen</label>
+								<input type="hidden" name="comment_nickname" value="" />
+							</div>
+							<div class="form-group">
+								<label for="comment_comment" class="col-sm-2 control-label">Kommentar</label>
+							</div>
+							<div class="form-group">
+								<div class="col-sm-12">
+									<textarea class="form-control" name="comment_comment" id="comment_comment" rows="3"></textarea>
+								</div>
+								<div class="col-sm-12 text-right">
+									<strong data-textlength="comment_comment" data-textlength-max="115">0 / 0</strong>
+								</div>
+							</div>
+						</form>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-default" data-dismiss="modal">Abbrechen</button>
+						<button type="button" class="btn btn-primary" data-action="addcomment">Speichern</button>
+					</div>
+				</div>
+			</div>
+		</div>
+		
+		<!-- Add -->
+		<div id="add" class="modal fade" role="dialog">
+			<div class="modal-dialog" role="document">
+				<div class="modal-content">
+					<div class="modal-body">
+						<form class="form-horizontal">
+							<div class="form-group">
+								<label for="nickname" class="col-sm-2 col-xs-3 control-label">Nickname</label>
+								<div class="col-sm-5 col-xs-5 remove-padding-right">
+									<input type="text" class="form-control" id="nickname" name="nickname" />
+								</div>
+								<label for="days" class="col-sm-2 col-xs-2 control-label remove-padding-right">Tage</label>
+								<div class="col-sm-3 col-xs-2 remove-padding-left">
+									<input type="text" class="form-control" id="days" name="days" value="3" />
+								</div>
+							</div>
+							<div class="form-group">
+								<label for="comment" class="col-sm-2 control-label">Kommentar</label>
+							</div>
+							<div class="form-group">
+								<div class="col-sm-12">
+									<textarea class="form-control" name="comment" id="comment" rows="3"></textarea>
+								</div>
+								<div class="col-sm-12 text-right">
+									<strong data-textlength="comment" data-textlength-max="115">0 / 0</strong>
+								</div>
+							</div>
+							<div class="form-group">
+								<label for="reason" class="col-sm-2 control-label">Begründung</label>
+							</div>
+							<div class="form-group">
+								<div class="col-sm-12">
+									<textarea class="form-control" name="reason" id="reason" rows="3"></textarea>
+								</div>
+								<div class="col-sm-12 text-right">
+									<strong data-textlength="reason" data-textlength-max="2000">0 / 0</strong>
+								</div>
+							</div>
+						</form>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-default" data-dismiss="modal">Abbrechen</button>
+						<button type="button" class="btn btn-primary" data-action="blacklist">Sperren</button>
+					</div>
+				</div>
+			</div>
+		</div>
+		
+		<!-- Remove -->
+		<div id="unlock" class="modal fade" role="dialog">
+			<div class="modal-dialog" role="document">
+				<div class="modal-content">
+					<div class="modal-body">
+						<form class="form-horizontal">
+							<div class="form-group">
+								<label for="unlock_nickname" class="col-sm-12 control-label">Unbekannt entsperren</label>
+								<input type="hidden" name="unlock_nickname" value="" />
+							</div>
+							<div class="form-group">
+								<label for="unlock_comment" class="col-sm-2 control-label">Kommentar</label>
+							</div>
+							<div class="form-group">
+								<div class="col-sm-12">
+									<textarea class="form-control" name="unlock_comment" id="unlock_comment" rows="3"></textarea>
+								</div>
+								<div class="col-sm-12 text-right">
+									<strong data-textlength="unlock_comment" data-textlength-max="115">0 / 0</strong>
+								</div>
+							</div>
+						</form>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-default" data-dismiss="modal">Abbrechen</button>
+						<button type="button" class="btn btn-primary" data-action="unblacklist">Entsperren</button>
+					</div>
+				</div>
+			</div>
+		</div>
+		
+		<!-- Search -->
+		<div id="search" class="modal fade" role="dialog">
+			<div class="modal-dialog" role="document">
+				<div class="modal-content">
+					<div class="modal-body">
+						<form class="form-horizontal">
+							<div class="form-group">
+								<label for="search_nickname" class="col-sm-2 col-xs-3 control-label">Nickname</label>
+								<div class="col-sm-12 remove-padding-right">
+									<input type="text" class="form-control" id="search_nickname" name="search_nickname" />
+								</div>
+							</div>
+						</form>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-default" data-dismiss="modal">Abbrechen</button>
+						<button type="button" class="btn btn-primary" data-action="shownick">Anzeigen</button>
+					</div>
+				</div>
+			</div>
+		</div>
+		
+		<!-- Settings -->
+		<div id="settings" class="modal fade" role="dialog">
+			<div class="modal-dialog" role="document">
+				<div class="modal-content">
+					<div class="modal-body">
+						<form class="form-horizontal">
+							<div class="form-group">
+								<label for="view" class="col-sm-12 control-label">Einsicht</label>
+							</div>
+							<div class="form-group container">
+								<div class="checkbox">
+									<label>
+										<input type="checkbox" name="view[cm]" value="1" /> ChannelModeratoren
+									</label>
+								</div>
+							</div>
+							<div class="form-group container">
+								<div class="checkbox">
+									<label>
+										<input type="checkbox" name="view[am]" value="1" /> AppManager
+									</label>
+								</div>
+							</div>
+							<div class="form-group">
+								<label for="lock" class="col-sm-12 control-label">Sperren</label>
+							</div>
+							<div class="form-group container">
+								<div class="checkbox">
+									<label>
+										<input type="checkbox" name="lock[cm]" value="1" /> ChannelModeratoren
+									</label>
+								</div>
+							</div>
+							<div class="form-group container">
+								<div class="checkbox">
+									<label>
+										<input type="checkbox" name="lock[am]" value="1" /> AppManager
+									</label>
+								</div>
+							</div>
+							<br />
+							<div class="form-group">
+								<label for="lock_rank" class="col-sm-12 control-label subcontrol">Höhere Ränge</label>
+							</div>
+							<div class="form-group container">
+								<div class="radio">
+									<label>
+										<input type="radio" name="lock_rank" value="none" /> dürfen von keinem gesperrt werden
+									</label>
+								</div>
+							</div>
+							<div class="form-group container">
+								<div class="radio">
+									<label>
+										<input type="radio" name="lock_rank" value="co" /> dürfen nur vom Channelbesitzer gesperrt werden
+									</label>
+								</div>
+							</div>
+							<div class="form-group container">
+								<div class="radio">
+									<label>
+										<input type="radio" name="lock_rank" value="all" /> darf jeder sperren
+									</label>
+								</div>
+							</div>
+							<br />
+							<div class="form-group">
+								<label for="lock_time" class="col-sm-12 control-label subcontrol">Sperrzeit</label>
+							</div>
+							<div class="form-group container">
+								<div class="radio">
+									<label>
+										<input type="radio" name="lock_time" value="co" /> Nur der Channelbesitzer darf Permanent sperren
+									</label>
+								</div>
+							</div>
+							<div class="form-group container">
+								<div class="radio">
+									<label>
+										<input type="radio" name="lock_time" value="all" /> Jeder darf Permanent sperren
+									</label>
+								</div>
+							</div>
+							<div class="form-group">
+								<label for="unlock" class="col-sm-12 control-label">Entsperren</label>
+							</div>
+							<div class="form-group container">
+								<div class="checkbox">
+									<label>
+										<input type="checkbox" name="unlock[cm]" value="1" /> ChannelModeratoren
+									</label>
+								</div>
+							</div>
+							<div class="form-group container">
+								<div class="checkbox">
+									<label>
+										<input type="checkbox" name="unlock[am]" value="1" /> AppManager
+									</label>
+								</div>
+							</div>
+							<br />
+							<div class="form-group container">
+								<div class="radio">
+									<label>
+										<input type="radio" name="unlock_type" value="co" /> Nur der Channelbesitzer darf entsperren
+									</label>
+								</div>
+							</div>
+							<div class="form-group container">
+								<div class="radio">
+									<label>
+										<input type="radio" name="unlock_type" value="user" /> Nur der Nutzer, der gesperrt hat, darf entsperren
+									</label>
+								</div>
+							</div>
+							<div class="form-group container">
+								<div class="radio">
+									<label>
+										<input type="radio" name="unlock_type" value="all" /> Jeder darf entsperren
+									</label>
+								</div>
+							</div>
+							<div class="form-group">
+								<label for="comments" class="col-sm-12 control-label">Kommentare</label>
+							</div>
+							<div class="form-group container">
+								<div class="checkbox">
+									<label>
+										<input type="checkbox" name="comments[cm]" value="1" /> ChannelModeratoren
+									</label>
+								</div>
+							</div>
+							<div class="form-group container">
+								<div class="checkbox">
+									<label>
+										<input type="checkbox" name="comments[am]" value="1" /> AppManager
+									</label>
+								</div>
+							</div>
+						</form>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-primary" data-action="savesettings">OK</button>
+					</div>
+				</div>
+			</div>
+		</div>
+		
+		<!-- Header -->
+		<nav class="navbar navbar-fixed-top">
+			<div class="container">
+				<div class="navbar-header">
+					<a class="navbar-brand" href="#">Blacklist</a>
+				</div>
+				<div id="navbar" class="navbar-right">
+					<ul class="nav navbar-nav">
+						<li><a data-action="refresh"></a></li>
+						<li><a data-action="search" data-toggle="modal" data-target="#search"></a></li>
+						<li><a data-action="add" data-toggle="modal" data-target="#add"></a></li>
+						<li><a data-action="settings"></a></li>
+						<li><a data-action="cancel"></a></li>
+					</ul>
+				</div>
+			</div>
+		</nav>
+		
+		<!-- Messages -->
+		<div id="message"></div>
+		
+		<!-- Content -->
+		<ul class="nav nav-pills">
+			<li role="presentation" class="active"><a data-view="acessible">Besucht (<span>0</span>)</a></li>
+			<li role="presentation"><a data-view="inacessible">Unbesucht (<span>0</span>)</a></li>
+		</ul>
+		<section>
+			<div id="acessible" class="show">
+				<table id="entries" class="table"></table>
+				<p class="error">
+					<img src="images/error.png" alt="" />
+					<strong>Keine Einträge vorhanden</strong>
+				</p>
+			</div>
+			<div id="inacessible" class="hide">
+				<table id="inacessible_entries" class="table"></table>
+				<p class="error">
+					<img src="images/error.png" alt="" />
+					<strong>Keine Einträge vorhanden</strong>
+				</p>
+			</div>
+		</section>
+		
+		<!-- Footer -->
+		<footer>
+			<div class="container">
+				<ul class="pagination"></ul>
+				<div class="page">Seite 0 / 0</div>
+			</div>
+		</footer>
+		<script type="text/javascript">			
+			Client.includeJS('/apps/api/jquery.min.js', 'js/bootstrap.min.js', 'https://cdn.knuddelscom.de/sf/libs/kcode/1.3.1/kcode.min.js', 'js/blacklist.js');
+		</script>
+	</body>
+</html>
